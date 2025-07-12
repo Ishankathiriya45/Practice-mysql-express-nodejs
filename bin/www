@@ -1,0 +1,11 @@
+const app = require("../src/server");
+const clc = require("cli-color");
+
+const port = process.env["PORT_" + process.env.RUN_MODE];
+app.listen(port, () => {
+  console.log(
+    `Server is running on port ${clc.yellow.underline(
+      port
+    )} in ${clc.yellow.underline("LOCAL")} environment`
+  );
+});

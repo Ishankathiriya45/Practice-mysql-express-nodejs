@@ -23,14 +23,14 @@ class GroupController {
             model: GroupMember,
             attributes: {
               include: [
-                // [
-                //   Sequelize.literal(`(
-                //       SELECT COUNT(*) FROM matchs 
-                //         WHERE matchs.p1 = groupMembers.user_fk
-                //         or matchs.p2 = groupMembers.user_fk
-                //     )`),
-                //   "matches_count",
-                // ],
+                [
+                  Sequelize.literal(`(
+                      SELECT COUNT(*) FROM matchs 
+                        WHERE matchs.p1 = groupMembers.user_fk
+                        or matchs.p2 = groupMembers.user_fk
+                    )`),
+                  "matches_count",
+                ],
                 [
                   Sequelize.literal(`(
                       SELECT COUNT(*) FROM matchs 
@@ -38,13 +38,13 @@ class GroupController {
                     )`),
                   "match_winning_count",
                 ],
-                // [
-                //   Sequelize.literal(`(
-                //       SELECT COUNT(*) FROM matchs 
-                //         WHERE matchs.loser_fk = groupMembers.user_fk
-                //     )`),
-                //   "match_losing_count",
-                // ],
+                [
+                  Sequelize.literal(`(
+                      SELECT COUNT(*) FROM matchs 
+                        WHERE matchs.loser_fk = groupMembers.user_fk
+                    )`),
+                  "match_losing_count",
+                ],
               ],
             },
           },
