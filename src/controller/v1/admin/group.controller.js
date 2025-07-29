@@ -3,10 +3,11 @@ const {
   ApiResponse: { successResponse, serverError },
 } = require("../../../responses");
 const {
-  db: { GroupMember },
+  db: { GroupMember, User },
 } = require("../../../db/models");
 const { MessageResponse: m } = require("../../../responses");
 const { Sequelize } = require("sequelize");
+const XLSX = require("xlsx");
 
 class GroupController {
   constructor() {
@@ -63,6 +64,39 @@ class GroupController {
     } catch (error) {
       const errMsg = typeof error == "string" ? error : error.message;
       return serverError(0, m.internalServerError, errMsg);
+    }
+  };
+
+  create = async (req, res) => {
+    try {
+      const workbook = XLSX.readFile(req.file.path);
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const users = XLSX.utils.sheet_to_json(sheet);
+
+      let created = 0;
+      let updated = 0;
+
+      for (const userData of users) {
+        const [user, wasCreated] = await User.upsert(
+          {
+            name: userData.name,
+            email: userData.email,
+            age: userData.age,
+          },
+          {
+            returning: true,
+            conflictFields: ["email"], // ensure email is set as unique in DB
+          }
+        );
+
+        if (wasCreated) created++;
+        else updated++;
+      }
+
+      return successResponse(1, "Users register successfully", created);
+    } catch (err) {
+      return serverError(0, "Failed", err.message);
     }
   };
 }
